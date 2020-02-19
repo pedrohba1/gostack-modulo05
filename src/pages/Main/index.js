@@ -4,10 +4,7 @@ import { Title } from './styles';
 export default function Main() {
     return (
         <div>
-            <Title error={false}>
-                main
-                <small>aa</small>
-            </Title>
+            <Title> hello </Title>
         </div>
     );
 }
