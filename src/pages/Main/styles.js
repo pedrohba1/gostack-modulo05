@@ -14,6 +14,11 @@ export const Form = styled.form`
     }
 `;
 
+export const ErrorMessage = styled.p`
+    padding: 4px;
+    color: red;
+`;
+
 const rotate = keyframes`
     from{
         transform: rotate(0deg);
@@ -52,6 +57,18 @@ export const SubmitButton = styled.button.attrs(props => ({
         css`
             svg {
                 animation: ${rotate} 2s linear infinite;
+            }
+        `}
+`;
+
+export const Input = styled.input.attrs(props => ({
+    error: props.error,
+}))`
+    ${props =>
+        props.error &&
+        css`
+             {
+                border: 1px solid red !important ;
             }
         `}
 `;

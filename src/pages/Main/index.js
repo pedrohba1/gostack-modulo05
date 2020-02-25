@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
 import { FaGithubAlt, FaSpinner, FaPlus } from 'react-icons/fa';
-import { Form, SubmitButton, List } from './styles';
+import { Form, SubmitButton, List, Input, ErrorMessage } from './styles';
 import Container from '../../components/Container';
 import api from '../../services/api';
 
@@ -13,6 +13,7 @@ export default class Main extends Component {
         newRepo: '',
         repositories: [],
         loading: false,
+        error: false,
     };
 
     // carregar dados do localStorage
@@ -33,7 +34,7 @@ export default class Main extends Component {
     }
 
     handleInputChange = e => {
-        this.setState({ newRepo: e.target.value });
+        this.setState({ newRepo: e.target.value, error: false });
     };
 
     handleSubmit = async e => {
@@ -47,17 +48,20 @@ export default class Main extends Component {
             const data = {
                 name: res.data.full_name,
             };
+
+            if (repositories.indexOf(data)) {
+                throw new Error('Repositório duplicado');
+            }
+
             this.setState({
                 repositories: [...repositories, data],
                 newRepo: '',
             });
         } catch (error) {
-            if (error.response) {
-                /*
-                 * The request was made and the server responded with a
-                 * status code that falls out of the range of 2xx
-                 */
+            if (error.message === 'Repositório duplicado') {
+                this.setState({ error: true });
             }
+
             this.setState({ loading: false });
             return;
         }
@@ -66,7 +70,7 @@ export default class Main extends Component {
     };
 
     render() {
-        const { newRepo, loading, repositories } = this.state;
+        const { newRepo, loading, repositories, error } = this.state;
         return (
             <Container>
                 <h1>
@@ -75,12 +79,14 @@ export default class Main extends Component {
                 </h1>
 
                 <Form onSubmit={this.handleSubmit}>
-                    <input
+                    <Input
                         placeholder="adicionar repositorio"
                         value={newRepo}
                         onChange={this.handleInputChange}
                         type="text"
+                        error={error}
                     />
+
                     <SubmitButton loading={loading}>
                         {loading ? (
                             <FaSpinner color="#FFF" size={14} />
@@ -89,6 +95,8 @@ export default class Main extends Component {
                         )}
                     </SubmitButton>
                 </Form>
+
+                {error && <ErrorMessage>repositório duplicado</ErrorMessage>}
 
                 <List>
                     {repositories.map(repository => (
